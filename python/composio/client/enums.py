@@ -6,6 +6,7 @@ Helper Enum classes.
 
 import typing as t
 from enum import Enum
+from typing import List
 
 
 class Tag(tuple, Enum):
@@ -538,12 +539,12 @@ class Action(tuple, Enum):
         return len(self.value) > 3 and self.value[3]
 
     @classmethod
-    def from_app(cls, name: str) -> "Action":
-        """Create Action type enum from app name."""
-        for action in cls:
-            if name == action.app:
-                return action
-        raise ValueError(f"No action type found for name `{name}`")
+    def from_app(cls, name: str) -> "List[Action]":
+        """Create list of Action type enums from app name."""
+        app_actions = [action for action in cls if action.app == name]
+        if not app_actions:
+            raise ValueError(f"No action type found for name `{name}`")
+        return app_actions
 
     @classmethod
     def from_action(cls, name: str) -> "Action":
