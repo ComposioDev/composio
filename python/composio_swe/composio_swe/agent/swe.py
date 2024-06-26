@@ -14,6 +14,11 @@ from composio import Composio
 from composio.local_tools.local_workspace.workspace.actions.create_workspace import (
     CreateWorkspaceResponse,
 )
+from composio_swe.composio_swe.config.prompts import (
+    swe_agent_goal,
+    swe_agent_role,
+    swe_expected_output,
+)
 from python.composio_swe.composio_swe.config.config_store import IssueConfig
 
 from .base_swe_agent import BaseSWEAgent
@@ -27,15 +32,15 @@ AGENT_LOGS_JSON_PATH = "agent_logs.json"
 
 class CoderAgentArgs(BaseModel):
     agent_role: str = Field(
-        default="You are the best programmer. You think carefully and step by step take action.",
+        default=swe_agent_role,
         description="role of the agent",
     )
     agent_goal: str = Field(
-        default="Help fix the given issue / bug in the code. And make sure you get it working.",
+        default=swe_agent_goal,
         description="goal for the agent",
     )
     task_expected_output: str = Field(
-        default="A patch should be generated which fixes the given issue",
+        default=swe_expected_output,
         description="expected output of the agent task",
     )
     agent_backstory_tmpl: str = Field(
@@ -48,6 +53,7 @@ class CoderAgentArgs(BaseModel):
     )
     issue_description_tmpl: str = Field(default=ISSUE_DESC_TMPL)
     agent_logs_dir: Path = Field(..., description="logs for agent")
+    is_benchmark: bool = Field(default=False, description="is running for benchmark")
 
 
 class CoderAgent(BaseSWEAgent):
@@ -69,9 +75,9 @@ class CoderAgent(BaseSWEAgent):
         self.composio_client = Composio()
 
         # initialize agent-related different prompts
-        self.agent_role = "You are the best programmer. You think carefully and step by step take action."
-        self.agent_goal = "Help fix the given issue / bug in the code. And make sure you get it working. Ask the reviewer agent to review the patch and submit it once they approve it."
-        self.expected_output = "A patch should be generated which fixes the given issue"
+        self.agent_role = self.args.agent_role
+        self.agent_goal = self.args.agent_goal
+        self.expected_output = self.args.task_expected_output
         self.agent_backstory_tmpl = args.agent_backstory_tmpl
         self.reviewer_backstory_tmpl = args.reviewer_backstory_tmpl
         self.issue_description_tmpl = args.issue_description_tmpl
@@ -83,6 +89,7 @@ class CoderAgent(BaseSWEAgent):
         )
         self.agent_logs: Dict[str, Any] = {}
         self.current_logs: List[Any] = []
+        self.is_benchmark = args.is_benchmark
 
     def save_history(self, instance_id):
         self.agent_logs[instance_id] = self.current_logs
@@ -187,30 +194,6 @@ class CoderAgent(BaseSWEAgent):
             expected_output=self.expected_output,
         )
 
-        # reviewer_agent = Agent(
-        #     role="You are the best reviewer. You think carefully and step by step take action.",
-        #     goal="Review the patch and make sure it fixes the issue.",
-        #     backstory=reviewer_backstory_added_instruction,
-        #     verbose=True,
-        #     llm=llm,
-        #     memory=True,
-        #     step_callback=self.add_in_logs,
-        #     allow_delegation=True,
-        # )
-
-        # review_task = Task(
-        #     description="Review the patch and make sure it fixes the issue.",
-        #     agent=reviewer_agent,
-        #     context=[coding_task],
-        #     expected_output="The patch is ready to be submitted to the repo.",
-        # )
-
-        # crew = Crew(
-        #     agents=[swe_agent, reviewer_agent],
-        #     tasks=[coding_task, review_task],
-        #     memory=True,
-        # )
-        # crew.kickoff()
         coding_task.execute()
         print("Getting patch")
         get_patch_resp = self.composio_client.actions.execute(

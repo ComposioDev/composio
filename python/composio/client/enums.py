@@ -13853,6 +13853,42 @@ class Action(tuple, Enum):
         True,
         True,
     )
+    CMDMANAGERTOOL_BLACKLINTER = (
+        "cmdmanagertool",
+        "cmdmanagertool_blacklinter",
+        True,
+        True,
+    )
+    CMDMANAGERTOOL_ISORTLINTER = (
+        "cmdmanagertool",
+        "cmdmanagertool_isortlinter",
+        True,
+        True,
+    )
+    CMDMANAGERTOOL_FLAKE8LINTER = (
+        "cmdmanagertool",
+        "cmdmanagertool_flake8linter",
+        True,
+        True,
+    )
+    CMDMANAGERTOOL_PYLINTLINTER = (
+        "cmdmanagertool",
+        "cmdmanagertool_pylintlinter",
+        True,
+        True,
+    )
+    CMDMANAGERTOOL_AUTOFLAKELINTER = (
+        "cmdmanagertool",
+        "cmdmanagertool_autoflakelinter",
+        True,
+        True,
+    )
+    CMDMANAGERTOOL_AUTOPEP8LINTER = (
+        "cmdmanagertool",
+        "cmdmanagertool_autopep8linter",
+        True,
+        True,
+    )
     CMDMANAGERTOOL_GITREPOTREE = (
         "cmdmanagertool",
         "cmdmanagertool_gitrepotree",

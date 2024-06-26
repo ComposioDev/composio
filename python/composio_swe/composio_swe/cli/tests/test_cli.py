@@ -4,10 +4,11 @@ from unittest.mock import patch
 
 import click.testing
 from click.testing import CliRunner
-from composio_coders.cli import cli
-from composio_coders.context import Context
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
+
+from composio_swe.composio_swe.cli import cli
+from composio_swe.composio_swe.config.context import Context, set_context
 
 
 class FakeListLLM(LLM):
@@ -104,8 +105,6 @@ class TestCLI(unittest.TestCase):
         """Test the solve command."""
         with self.runner.isolated_filesystem():
             # Assuming 'set_context' is a method to set the context directly
-            from composio_coders.context import set_context
-
             issue_config = {
                 "repo_name": "test_repo",
                 "issue_id": "123",
@@ -129,8 +128,6 @@ class TestCLI(unittest.TestCase):
         """Test the solve command."""
         with self.runner.isolated_filesystem():
             # Assuming 'set_context' is a method to set the context directly
-            from composio_coders.context import set_context
-
             issue_config = {
                 "repo_name": "test_repo",
                 "issue_id": "123",

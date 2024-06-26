@@ -19,8 +19,8 @@ class GitRepoTree(BaseAction):
     Generate a tree of the repository. This command lists all files in the current commit across all directories.
     Returns a list of files with their relative paths in the codebase.
     It is useful to understand the file structure of the codebase and to find the relevant files for a given issue.
-    The command writes the result to a file in current directory. Read the file 'git_repo_tree.txt' for getting the
-    git-repo-tree results
+    The command writes the result to a file in current directory.
+    Read the file 'git_repo_tree.txt' for getting the git-repo-tree results
     """
 
     _display_name = "Git repo tree action"
@@ -40,6 +40,7 @@ class GitRepoTree(BaseAction):
         output, return_code = communicate(
             self.container_process, self.container_obj, self.command, self.parent_pids
         )
+        # output is saved in a file in the command, and then is supposed to be read by agent
         output, return_code = process_output(output, return_code)
         return BaseResponse(
             output="Check git_repo_tree.txt for the git-repo-tree results. Use Open File function to check the file.",

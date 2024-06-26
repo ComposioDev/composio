@@ -33,7 +33,8 @@ class GithubCloneRequest(BaseRequest):
     )
     just_reset: bool = Field(
         False,
-        description="If true, the repo will not be cloned. It will be assumed to exist. The repo will be cleaned and reset to the given commit-id",
+        description="If true, the repo will not be cloned. It will be assumed to exist."
+        " The repo will be cleaned and reset to the given commit-id",
     )
 
 
@@ -72,9 +73,13 @@ class GithubCloneCmd(BaseAction):
         if self.container_process is None:
             raise ValueError("Container process is not set")
 
-        repo_dir = request_data.repo_name.split("/")[-1].strip()
+        repo_name = request_data.repo_name
+        repo_dir = repo_name.split("/")[-1].strip()
+        git_clone_cmd = f"git clone https://{git_token}@github.com/{repo_name}.git"
+        if request_data.branch_name and request_data.branch_name.strip():
+            git_clone_cmd = f"git clone -b {request_data.branch_name}  https://{git_token}@github.com/{repo_name}.git"
         command_list = [
-            f"git clone https://{git_token}@github.com/{request_data.repo_name}.git",
+            git_clone_cmd,
             f"cd {repo_dir}",
         ]
         if request_data.commit_id:
